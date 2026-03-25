@@ -1,75 +1,170 @@
-# React + TypeScript + Vite
+# KitGlobal Blog App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript blog application with full CRUD for posts and comments. Built with Firebase Firestore as the backend, Redux Toolkit for state management, and shadcn/ui for the interface.
 
-Currently, two official plugins are available:
+🔗 **[DEMO LINK](https://<your_account>.github.io/kitglobal/)**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> Replace `<your_account>` with your GitHub username.
 
-## React Compiler
+---
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Features
 
-Note: This will impact Vite dev & build performances.
+- Create, edit, delete posts
+- Add, edit, delete comments per post
+- Filter posts by title, content, and author
+- Modal dialogs for creating and editing posts/comments
+- Form validation with Zod + React Hook Form
+- Real-time sync with Firebase Firestore
+- Responsive UI with Tailwind CSS + shadcn/ui
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| Layer    | Technology                            |
+| -------- | ------------------------------------- |
+| Frontend | React 18, TypeScript                  |
+| State    | Redux Toolkit                         |
+| Forms    | React Hook Form, Zod                  |
+| UI       | shadcn/ui, Tailwind CSS, Lucide Icons |
+| Backend  | Firebase Firestore                    |
+| Routing  | React Router DOM v6                   |
+| Build    | Vite                                  |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Vovanchu/kitglobal.git
+cd kitglobal
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Install dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+### 3. Configure environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## Firebase Setup
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Enable **Firestore Database** (Native mode)
+4. Set Firestore Rules for development:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
+5. Create a **composite index** for the comments query (Firestore will prompt you with a link in the browser console on first run):
+   - Collection: `comments`
+   - Fields: `postId` (Ascending), `createdAt` (Ascending)
+
+---
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── store.ts                  # Redux store
+│   └── features/
+│       ├── posts/
+│       │   ├── postSlice.ts      # Post actions & reducer
+│       │   └── postAPI.ts        # Firestore CRUD for posts
+│       ├── comments/
+│       │   ├── commentsSlice.ts  # Comments actions & reducer
+│       │   └── commentsAPI.ts    # Firestore CRUD for comments
+│       └── ui/
+│           └── uiSlice.ts        # Modal state (open/close, type, data)
+├── components/
+│   ├── PostForm.tsx              # Create/edit post modal form
+│   ├── CommentsForm.tsx          # Add comment modal form
+│   ├── CreatePostModal.tsx       # Dialog wrapper (routes PostForm/CommentsForm)
+│   ├── PostCard.tsx              # Post list item
+│   ├── Filter.tsx                # Search & author filter bar
+│   ├── Header.tsx                # Header components with logo and button
+│   └── Loader.tsx                # Loading spinner
+├── firebase/
+│   └── firebase.ts               # Firebase app initialization
+├── schemas/
+│   ├── postSchema.ts             # Zod schema for posts
+│   └── commentSchema.ts          # Zod schema for comments
+├── types/
+│   ├── Post.ts                   # Post type
+│   └── comments.ts               # Comment type
+├── pages/
+│   ├── Home.tsx                  # Posts list page
+│   └── PostPage.tsx              # Single post + comments page
+└── main.tsx                      # App entry point
+```
+
+---
+
+## Available Scripts
+
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run preview    # Preview production build
+npm run lint       # Run ESLint
+```
+
+---
+
+## Environment Variables Reference
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
+```
+
+---
+
+## Notes
+
+- Comment count on the home page is taken from the Redux store — `fetchComments(postId)` is called on `PostPage` mount to keep it in sync.
+- Modal state (`modalType`, `modalData`) lives in `uiSlice` — the `CreatePostModal` component renders either `PostForm` or `CommentsForm` based on `modalType`.
+- `PostForm` and `CommentsForm` return only `<DialogContent>` — the parent `<Dialog>` wrapper lives exclusively in `CreatePostModal`.
+
+---
