@@ -72,7 +72,10 @@ export const PostCard = ({ post }: { post: Post }) => {
       </div>
 
       <Button
-        onClick={() => dispatch(openModal({ type: "addComment" }))}
+        onClick={() => {
+          dispatch(openModal({ type: "addComment" }));
+          dispatch(setSelectedPost(post));
+        }}
         className="cursor-pointer"
       >
         Add comment
